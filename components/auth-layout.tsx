@@ -9,8 +9,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <Button variant="ghost" size="icon" className="fixed top-4 right-4" onClick={toggleTheme}>
-        {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+      <Button variant="ghost" size="icon" className="fixed top-4 right-4 dark:bg-gray-880 hover:bg-transparent" onClick={toggleTheme}>
+        {theme === "light" ? <Moon className="h-5 w-5 dark:text-white " /> : <Sun className="h-5 w-5 bg-gray-880 text-white" />}
         <span className="sr-only">Toggle theme</span>
       </Button>
       <div className="w-full max-w-md">

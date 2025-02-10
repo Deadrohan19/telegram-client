@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthLayout } from "@/components/auth-layout";
 import { PhoneForm } from "@/components/phone-form";
 import { VerificationForm } from "@/components/verification-form";
@@ -8,6 +8,7 @@ import { TwoStepForm } from "@/components/two-step-form";
 import { SuccessScreen } from "@/components/success-screen";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { invoke } from '@tauri-apps/api/core';
 
 type Step = "phone" | "verification" | "two-step" | "success";
 
@@ -135,7 +136,6 @@ export default function Home() {
             API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
             API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
             sessionId: sessionId,
-
           }
         }
         );
@@ -162,6 +162,20 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const listener = (event: any) => {
+      if (event.key === 'F11') {
+        event.preventDefault(); // Prevent browser default behavior
+        invoke('toggle_fullscreen');
+      }
+    }
+    window.addEventListener('keydown', listener);
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', listener);
+    }
+  }, [])
+
   return (
     <AuthLayout>
       {step === "phone" && (
@@ -171,9 +185,10 @@ export default function Home() {
         <VerificationForm
           onSubmit={handleVerificationSubmit}
           onBack={() => setStep("phone")}
+          loading={loading}
         />
       )}
-      {step === "two-step" && <TwoStepForm onSubmit={handleTwoStepSubmit} />}
+      {step === "two-step" && <TwoStepForm onSubmit={handleTwoStepSubmit} loading={loading}/>}
       {step === "success" && <SuccessScreen username={username} />}
     </AuthLayout>
   );

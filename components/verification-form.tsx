@@ -1,15 +1,17 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Loader2 } from "lucide-react"
 
 interface VerificationFormProps {
   onSubmit: (code: string) => void
   onBack: () => void
+  loading: boolean
 }
 
-export function VerificationForm({ onSubmit, onBack }: VerificationFormProps) {
+export function VerificationForm({ onSubmit, onBack, loading }: VerificationFormProps) {
   const [code, setCode] = useState(["", "", "", "", ""])
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -35,7 +37,11 @@ export function VerificationForm({ onSubmit, onBack }: VerificationFormProps) {
       inputRefs.current[index - 1]?.focus()
     }
   }
-
+ useEffect(() => {
+    if (inputRefs.current) {
+      inputRefs.current[0]?.focus(); // Autofocus on mount
+    }
+  }, []);
   return (
     <div className="space-y-4">
       <div className="space-y-4">
@@ -49,19 +55,26 @@ export function VerificationForm({ onSubmit, onBack }: VerificationFormProps) {
               type="text"
               maxLength={1}
               placeholder="-"
-              className="w-12 h-12 text-center text-2xl"
+              className="w-12 h-12 text-center text-2xl dark:text-white"
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              ref={(el) => {inputRefs.current[index] = el; return;}}
+              ref={(el) => { inputRefs.current[index] = el; return; }}
             />
           ))}
         </div>
       </div>
       <Button variant="link" className="w-full text-sm text-gray-500" onClick={onBack}>
-        Change Phone Number
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            loading...
+          </>
+        ) : (
+          "Change Phone Number"
+        )}
       </Button>
-    </div>
+    </div >
   )
 }
 
