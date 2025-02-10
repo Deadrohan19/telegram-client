@@ -1,10 +1,9 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 
 use std::sync::{Arc, Mutex};
-use tauri::{ Manager, RunEvent };
-use tauri_plugin_shell::process::CommandChild;
+use tauri::{Emitter, Manager, RunEvent};
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
-
 
 #[tauri::command]
 fn toggle_fullscreen(window: tauri::Window) {
@@ -28,13 +27,39 @@ fn spawn_sidecar(app_handle: tauri::AppHandle) -> Result<(), String> {
         .shell()
         .sidecar("telegram")
         .map_err(|e| e.to_string())?;
-    let (_rx, child) = sidecar_command.spawn().map_err(|e| e.to_string())?;
+    let (mut rx, child) = sidecar_command.spawn().map_err(|e| e.to_string())?;
     // Store the child process in the app state
     if let Some(state) = app_handle.try_state::<Arc<Mutex<Option<CommandChild>>>>() {
         *state.lock().unwrap() = Some(child);
     } else {
         return Err("Failed to access app state".to_string());
     }
+
+    // Spawn an async task to handle sidecar communication
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = rx.recv().await {
+            match event {
+                CommandEvent::Stdout(line_bytes) => {
+                    let line = String::from_utf8_lossy(&line_bytes);
+                    println!("Sidecar stdout: {}", line);
+                    // Emit the line to the frontend
+                    app_handle
+                        .emit("sidecar-stdout", line.to_string())
+                        .expect("Failed to emit sidecar stdout event");
+                }
+                CommandEvent::Stderr(line_bytes) => {
+                    let line = String::from_utf8_lossy(&line_bytes);
+                    eprintln!("Sidecar stderr: {}", line);
+                    // Emit the error line to the frontend
+                    app_handle
+                        .emit("sidecar-stderr", line.to_string())
+                        .expect("Failed to emit sidecar stderr event");
+                }
+                _ => {}
+            }
+        }
+    });
+
     Ok(())
 }
 
@@ -46,7 +71,7 @@ pub fn run() {
             app.manage(Arc::new(Mutex::new(None::<CommandChild>)));
             // Clone the app handle for use elsewhere
             let app_handle = app.handle().clone();
-            // Spawn the Python sidecar on startup
+            // Spawn the sidecar on startup
             println!("[tauri] Creating sidecar...");
             spawn_sidecar(app_handle).ok();
             Ok(())

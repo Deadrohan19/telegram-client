@@ -6,7 +6,7 @@
     "main"
   ],
   "permissions": [ 
-        "core:default",
+    "core:default",
     "core:window:default",
     {
       "identifier": "shell:allow-execute",
@@ -32,7 +32,6 @@
       ]
     },
     "shell:default",
-    "http:default",
-    "stronghold:default"
+    "http:default"
   ]
 }
