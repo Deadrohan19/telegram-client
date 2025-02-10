@@ -7,6 +7,16 @@
   ],
   "permissions": [
     "core:default",
-    "stronghold:default"
+    "stronghold:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "binaries/telegram",
+          "sidecar": true
+        }
+      ]
+    },
+    "shell:allow-open"
   ]
 }
