@@ -39,8 +39,6 @@ export default function Home() {
 
     try {
       const res = await axios.post<AuthResponse>(`${API_BASE_URL}/sendCode`, {
-        API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
-        API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
         sessionId: sessionId,
         phoneNumber: phone,
       });
@@ -71,8 +69,6 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await axios.post<AuthResponse>(`${API_BASE_URL}/verifyCode`, {
-        API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
-        API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
         sessionId: sessionId,
         phoneNumber,
         phoneCode: code,
@@ -87,10 +83,7 @@ export default function Home() {
           const userInfo = await axios.get<AuthResponse>(
             `${API_BASE_URL}/getUserInfo`, {
             params: {
-              API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
-              API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
               sessionId: sessionId,
-
             }
           }
           );
@@ -122,8 +115,6 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await axios.post<AuthResponse>(`${API_BASE_URL}/verify2FA`, {
-        API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
-        API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
         sessionId: sessionId,
         password,
       });
@@ -133,8 +124,6 @@ export default function Home() {
         const userInfo = await axios.get<AuthResponse>(
           `${API_BASE_URL}/getUserInfo`, {
           params: {
-            API_ID: process.env.NEXT_PUBLIC_TELEGRAM_API_ID,
-            API_HASH: process.env.NEXT_PUBLIC_TELEGRAM_API_HASH,
             sessionId: sessionId,
           }
         }
@@ -165,7 +154,7 @@ export default function Home() {
   useEffect(() => {
     const listener = (event: any) => {
       if (event.key === 'F11') {
-        event.preventDefault(); // Prevent browser default behavior
+        event.preventDefault();
         invoke('toggle_fullscreen');
       }
     }
