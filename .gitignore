@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/sidecar-telegram/node_modules
+/sidecar-telegram/telegram
+/src-tauri/binaries
